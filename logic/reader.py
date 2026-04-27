@@ -11,6 +11,7 @@ def FeedGrabber(url):
         return
     else:
         print("Successfuly grabbed RSS feed")
+        #print(feed)
         cleanFeed = SanitizeFeed(feed)
         return cleanFeed
 
@@ -22,14 +23,21 @@ def SanitizeURL(dirtyURL):
     cleanURL = urlunparse((parsedURL.scheme, parsedURL.netloc, parsedURL.path, '', '', ''))
     cleanURL = cleanURL.rstrip('/')
 
+    # also set url to lowercase
+    cleanURL = cleanURL.lower()
+
+    #print("Clean URL: " + cleanURL)
     return cleanURL
 
 def SanitizeFeed(feed):
 
-    for entry in feed.entries:        
+    for entry in feed.entries:   
+
         print(feed.feed.get('title')) # RSS Feed Title , testing is Bleeping Computer
         print(entry.get('title')) # Article Titles
-        print(entry.get('link')) # gets link
+
+        cleanArticleLink = SanitizeURL(entry.get('link'))
+        print(cleanArticleLink)
         
         if entry.get('published_parsed'):
             cleanDate = time.strftime('%Y-%m-%d %H:%M:%S', entry.published_parsed)
@@ -47,9 +55,7 @@ def SanitizeFeed(feed):
             print("No summary available")
             
         # I don't like when the ID is just the url, so taking the hash of the url instead
-        # @TODO: sanitize URL prior to processing
-        # @TODO: break this into steps rather than one long ugly line
-        print(hashlib.sha256(entry.get('id').encode('utf-8')).hexdigest())
+        print(hashlib.sha256(cleanArticleLink.encode('utf-8')).hexdigest())
         
         print("\n")
 
@@ -63,7 +69,8 @@ def SanitizeFeed(feed):
 
 def main():
     testURL = "https://www.bleepingcomputer.com/feed/"
-    testFeed = FeedGrabber(testURL)
+    cleanURL = SanitizeURL(testURL)
+    testFeed = FeedGrabber(cleanURL)
 
 
 if __name__ == "__main__":
