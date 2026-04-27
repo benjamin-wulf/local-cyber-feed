@@ -1,6 +1,7 @@
 import feedparser
 import time
 import hashlib
+from urllib.parse import urlparse, urlunparse
 
 
 def FeedGrabber(url):
