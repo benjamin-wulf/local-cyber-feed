@@ -14,6 +14,16 @@ def FeedGrabber(url):
         cleanFeed = SanitizeFeed(feed)
         return cleanFeed
 
+# Fully stripping ALL parameters may break some sites
+def SanitizeURL(dirtyURL):
+
+    parsedURL = urlparse(dirtyURL)
+    
+    cleanURL = urlunparse((parsedURL.scheme, parsedURL.netloc, parsedURL.path, '', '', ''))
+    cleanURL = cleanURL.rstrip('/')
+
+    return cleanURL
+
 def SanitizeFeed(feed):
 
     for entry in feed.entries:        
