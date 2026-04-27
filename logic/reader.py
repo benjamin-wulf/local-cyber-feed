@@ -23,10 +23,9 @@ def SanitizeURL(dirtyURL):
     cleanURL = urlunparse((parsedURL.scheme, parsedURL.netloc, parsedURL.path, '', '', ''))
     cleanURL = cleanURL.rstrip('/')
 
-    # also set url to lowercase
+    # set url to lowercase
     cleanURL = cleanURL.lower()
 
-    #print("Clean URL: " + cleanURL)
     return cleanURL
 
 def SanitizeFeed(feed):
@@ -55,7 +54,13 @@ def SanitizeFeed(feed):
             print("No summary available")
             
         # I don't like when the ID is just the url, so taking the hash of the url instead
-        print(hashlib.sha256(cleanArticleLink.encode('utf-8')).hexdigest())
+        guid = entry.get('id')
+        if "https://" in guid:
+            # feed is using link as guid, trust publisher
+            print(hashlib.sha256(guid.encode('utf-8')).hexdigest())
+        else:
+            # feed is not, use our normalized/sanitized link
+            print(hashlib.sha256(cleanArticleLink.encode('utf-8')).hexdigest())
         
         print("\n")
 
