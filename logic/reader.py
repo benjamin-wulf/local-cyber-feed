@@ -210,7 +210,10 @@ def DeleteFeed(feedID):
         #delete feed and related articles
         try:
             cursor.execute("DELETE FROM feeds WHERE id = ?", (feedID,))
-            cursor.execute("DELETE FROM articles WHERE feed_id = ?", (feedID,))
+            
+            # db should automatically wipe articles associated with this feedID
+            #cursor.execute("DELETE FROM articles WHERE feed_id = ?", (feedID,))
+            
             conn.commit()
             return {"status":"successfully deleted feed", "feed_id": feedID}
         except sqlite3.Error as e:
@@ -232,12 +235,10 @@ def main():
     # can put the raw url straight in, it gets sanitized in AddFeed()
     
     result = AddFeed(testURL)
-    
-    #print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
+    print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
 
-    #result = DeleteFeed(2)
-    
-    #print(result)
+    #result = DeleteFeed(4)
+    #print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
 
 
 if __name__ == "__main__":
