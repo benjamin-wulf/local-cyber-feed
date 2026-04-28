@@ -1,0 +1,20 @@
+--- schema.sql
+
+CREATE TABLE IF NOT EXISTS feeds (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    url TEXT NOT NULL UNIQUE,
+    title TEXT NOT NULL,
+    added_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS articles (
+    id TEXT PRIMARY KEY,
+    feed_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    link TEXT NOT NULL,
+    published_date TEXT,
+    summary TEXT,
+    content_hash TEXT NOT NULL,
+    is_read INTEGER DEFAULT 0,
+    FOREIGN KEY (feed_id) REFERENCES feeds(id) ON DELETE CASCADE
+);
