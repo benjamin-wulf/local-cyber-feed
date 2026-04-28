@@ -148,25 +148,18 @@ def AddFeed(rawURL):
         )
         feedID = cursor.lastrowid
 
+        #TODO: Clean up a lot of the retrieval by breaking into separate functions
         for entry in feed.entries:
             # need unique id (guid/link/sha256 hash of link) feed_id, article title, clean link, published date, summary, content hash 
-            #print("RSS Feed Title: " + feed.feed.get('title')) # RSS Feed Title , testing is Bleeping Computer
-            #print("Article Title: " + entry.get('title')) # Article Titles
 
             articleTitle = entry.get('title')
-
             cleanArticleLink = SanitizeURL(entry.get('link'))
-
-            #print("Clean Article Link: " + cleanArticleLink)
             
             if entry.get('published_parsed'):
                 cleanDate = time.strftime('%Y-%m-%d %H:%M:%S', entry.published_parsed)
             else:
                 cleanDate = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
             
-            #print("Date: " + cleanDate)
-
-            # get summary
             rawContent = ""
             if entry.get('content'):
                 rawContent = entry.get('content')
@@ -177,9 +170,6 @@ def AddFeed(rawURL):
 
             cleanContent = SanitizeContent(rawContent)
             contentHash = GetContentHash(rawContent)
-
-            #print("Cleaned Content is: " + SanitizeContent(rawContent))
-            #print("Content Hash is: " + GetContentHash(rawContent))
                 
             # I don't like when the ID is just the url, so taking the hash of the url instead
             if entry.get('guidislink'):
@@ -198,8 +188,8 @@ def AddFeed(rawURL):
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             """, (articleHashID, feedID, articleTitle, cleanArticleLink, cleanDate, cleanContent, contentHash))
         
-            conn.commit()
-            return {"status":"success", "feed_id": feedID}
+        conn.commit()
+        return {"status":"success", "feed_id": feedID}
         
     except sqlite3.Error as e:
         conn.rollback()
@@ -207,15 +197,48 @@ def AddFeed(rawURL):
     finally:
         conn.close()
 
+# Will need to implement a "GetFeedID function"
+def DeleteFeed(feedID):
+
+    conn = GetDBConnection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM feeds WHERE id = ?", (feedID,))
+
+    feedExists = cursor.fetchone()
+
+    if feedExists:
+        #delete feed and related articles
+        try:
+            cursor.execute("DELETE FROM feeds WHERE id = ?", (feedID,))
+            cursor.execute("DELETE FROM articles WHERE feed_id = ?", (feedID,))
+            conn.commit()
+            return {"status":"successfully deleted feed", "feed_id": feedID}
+        except sqlite3.Error as e:
+            conn.rollback()
+            return {"status": "error", "message": str(e)}
+        finally:
+            conn.close()
+
+    else:
+        #feed doesn't exist
+        return {"status": "feed not found in db"}
 
 
 def main():
     testURL = "https://www.bleepingcomputer.com/feed/"
     #cleanURL = SanitizeURL(testURL)
     #testFeed = FeedGrabber(cleanURL)
+    
     # can put the raw url straight in, it gets sanitized in AddFeed()
+    
     result = AddFeed(testURL)
-    print(result)
+    
+    #print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
+
+    #result = DeleteFeed(2)
+    
+    #print(result)
+
 
 if __name__ == "__main__":
     main()
