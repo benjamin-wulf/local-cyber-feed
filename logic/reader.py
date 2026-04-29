@@ -229,12 +229,13 @@ def DeleteFeed(feedID):
 
 def main():
     testURL = "https://www.bleepingcomputer.com/feed/"
+    testURL2 = "https://feeds.feedburner.com/TheHackersNews"
     #cleanURL = SanitizeURL(testURL)
     #testFeed = FeedGrabber(cleanURL)
     
     # can put the raw url straight in, it gets sanitized in AddFeed()
     
-    result = AddFeed(testURL)
+    result = AddFeed(testURL2)
     print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
 
     #result = DeleteFeed(4)
