@@ -24,8 +24,29 @@
         <div class="article">
             <h3><a href="{{ article['link'] }}">{{ article['title'] }}</a></h3>
             <p>From: <em>{{ article['feed_name'] }}</em></p>
-            <p>Date: <em>{{ article['published_date'] }}</em></p>
+            <p>Date: <em class = "local-date" data-utc="{{ article['published_date'] }}">{{ article['published_date'] }} (UTC)</em></p>
         </div>
     {% endfor %}
 </body>
+<script>
+    function convertToLocal() {
+
+        const dateElements = document.querySelectorAll('.local-date');
+
+        dateElements.forEach(el => {
+            const utcString = el.getAttribute('data-utc');
+            if (utcString) {
+                const date = new Date(utcString + "Z"); 
+                
+                el.innerText = date.toLocaleString(undefined, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short'
+                });
+            }
+        });
+    }
+
+    // Run the function immediately
+    convertToLocal();
+</script>
 </html>
