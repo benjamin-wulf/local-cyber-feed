@@ -16,5 +16,6 @@ CREATE TABLE IF NOT EXISTS articles (
     summary TEXT,
     content_hash TEXT NOT NULL,
     is_read INTEGER DEFAULT 0,
+    added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (feed_id) REFERENCES feeds(id) ON DELETE CASCADE
 );
