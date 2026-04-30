@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from flask_apscheduler import APScheduler
 import sys
 from pathlib import Path
 from datetime import datetime, timezone
@@ -22,6 +23,18 @@ def index():
 
     #should have gotten feeds and 10 recent articles, now need to give the data to the HTML template
     return render_template('index.html', feeds=feeds, articles=articles)
+
+
+scheduler = APScheduler()
+
+@scheduler.task('interval', id='do_update_feeds', minutes=30)
+def UpdateFeedsTask():
+    with app.app_context():
+        print("Running background sync...")
+        # fetch & update
+
+scheduler.init_app(app)
+scheduler.start()
 
 if __name__ == '__main__':
     app.run(debug=True)
