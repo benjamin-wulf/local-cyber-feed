@@ -8,7 +8,9 @@ from urllib.parse import urlparse, urlunparse
 from db.connection import GetDBConnection
 
 
+# Caution: does not Sanitize the url before grabbing them
 def FeedGrabber(url):
+    # Add sanitization here
     feed = feedparser.parse(url)
     if (feed.bozo == 1):
         print("Failed to grab RSS feed.")
@@ -118,6 +120,7 @@ def SanitizeFeed(feed):
 
 def AddFeed(rawURL):
 
+    #TODO: move url sanitize to FeedGrabber()
     cleanURL = SanitizeURL(rawURL)
 
     conn = GetDBConnection()
@@ -182,6 +185,7 @@ def AddFeed(rawURL):
                 # just use our cleaned article link
                 articleHashID = hashlib.sha256(cleanArticleLink.encode('utf-8')).hexdigest()
 
+            #@TODO: Probably update the "INSERT OR IGNORE INTO" as I think it's problematic
             cursor.execute("""
                 INSERT OR IGNORE INTO articles
                 (id, feed_id, title, link, published_date, summary, content_hash)
@@ -226,6 +230,20 @@ def DeleteFeed(feedID):
         #feed doesn't exist
         return {"status": "feed not found in db"}
 
+def UpdateAllFeeds():
+
+    conn = GetDBConnection()
+    cursor = conn.cursor()
+
+    urls = cursor.execute('SELECT id, url FROM feeds').fetchall()
+
+    # First, get list of feed IDs and links in feeds db
+    # Next, loop through and call FeedGrabber(url) for each
+    # If we're pulling from DB, we should be safe to assume the links are already Sanitized
+    # Add any new articles
+    # in future, update existing ones as well
+    
+    conn.close()
 
 def main():
     testURL = "https://www.bleepingcomputer.com/feed/"
@@ -235,11 +253,12 @@ def main():
     
     # can put the raw url straight in, it gets sanitized in AddFeed()
     
-    result = AddFeed(testURL)
-    print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
+    UpdateAllFeeds()
+    #result = AddFeed(testURL)
+    #print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
 
-    result = AddFeed(testURL2)
-    print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
+    #result = AddFeed(testURL2)
+    #print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
 
     #result = DeleteFeed(4)
     #print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
