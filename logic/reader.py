@@ -235,10 +235,16 @@ def main():
     
     # can put the raw url straight in, it gets sanitized in AddFeed()
     
+    result = AddFeed(testURL)
+    print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
+
     result = AddFeed(testURL2)
     print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
 
     #result = DeleteFeed(4)
+    #print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
+    
+    #result = DeleteFeed(5)
     #print(f"Status: {result['status']} with feed ID: {result['feed_id']}")
 
 
