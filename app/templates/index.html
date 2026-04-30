@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <Title>local-cyber-feed</Title>
+        <style>
+            body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
+            .article { border-bottom: 1px solid #eee; padding: 10px 0;}
+        </style>
+    </head>
+    <body>
+    <h1>local-cyber-feeds</h1>
+
+    <h2>Test Feeds</h2>
+    <ul>
+        {% for feed in feeds %}
+            <li>{{ feed['title'] }}</li>
+        {% endfor %}
+    </ul>
+
+    <hr>
+
+    <h2>Recent Articles</h2>
+    {% for article in articles %}
+        <div class="article">
+            <h3><a href="{{ article['link'] }}">{{ article['title'] }}</a></h3>
+            <p>From: <em>{{ article['feed_name'] }}</em></p>
+            <p>Date: <em>{{ article['published_date'] }}</em></p>
+        </div>
+    {% endfor %}
+</body>
+</html>
