@@ -15,7 +15,7 @@ def FeedGrabber(url):
         print("Failed to grab RSS feed.")
         return
     else:
-        print("Successfuly grabbed RSS feed")
+        print(f"Successfuly grabbed RSS feed from {feed.feed.get('title', cleanURL)}")
         #print(feed)
         # cleanFeed = SanitizeFeed(feed)
         return feed
@@ -152,7 +152,6 @@ def AddFeed(rawURL):
 
         #TODO: Clean up a lot of the retrieval by breaking into separate functions
         for entry in feed.entries:
-            # need unique id (guid/link/sha256 hash of link) feed_id, article title, clean link, published date, summary, content hash 
 
             articleTitle = entry.get('title')
             cleanArticleLink = SanitizeURL(entry.get('link'))
@@ -229,20 +228,94 @@ def DeleteFeed(feedID):
         #feed doesn't exist
         return {"status": "feed not found in db"}
 
+def GetArticleData(feed):
+    #@TODO: move the majority of AddFeed and UpdateAllFeeds() into this function for a cleaner way to pull information from articles
+    print("this function doesn't do anything yet")
+
 def UpdateAllFeeds():
 
+    #@TODO: should wrap db db connections in a try block, with a finally: to conn.close()
     conn = GetDBConnection()
     cursor = conn.cursor()
 
-    urls = cursor.execute('SELECT id, url FROM feeds').fetchall()
+    try:
+        urls = cursor.execute('SELECT id, url FROM feeds').fetchall()
+        
+        localArticles = cursor.execute('SELECT id FROM articles').fetchall()
 
+        articleIDs = []
+        for id in localArticles:
+            articleIDs.append(id['id'])
+
+        for url in urls:
+
+            feed = FeedGrabber(url['url'])
+
+            if feed.bozo:
+                print(f"ERROR: could not grab feed from url: {url['url']}")
+                continue
+
+            for entry in feed.entries:
+                articleTitle = entry.get('title')
+                cleanArticleLink = SanitizeURL(entry.get('link'))
+                
+                if entry.get('published_parsed'):
+                    cleanDate = time.strftime('%Y-%m-%d %H:%M:%S', entry.published_parsed)
+                else:
+                    cleanDate = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+                
+                rawContent = ""
+                if entry.get('content'):
+                    rawContent = entry.get('content')
+                elif entry.get('summary'):
+                    rawContent = entry.get('summary')
+                else:
+                    rawContent = "No summary available."
+
+                cleanContent = SanitizeContent(rawContent)
+                contentHash = GetContentHash(rawContent)
+                    
+                # I don't like when the ID is just the url, so taking the hash of the url instead
+                if entry.get('guidislink'):
+                    # feed is using link as guid, trust publisher
+                    articleHashID = hashlib.sha256(entry.guid.encode('utf-8')).hexdigest()
+                elif all([urlparse(entry.guid).scheme in ['http', 'https'], urlparse(entry.guid).netloc]):
+                    # feed doesn't have guidislink set, but guid does appear to be a link
+                    articleHashID = hashlib.sha256(entry.guid.encode('utf-8')).hexdigest()
+                else:
+                    # just use our cleaned article link
+                    articleHashID = hashlib.sha256(cleanArticleLink.encode('utf-8')).hexdigest()
+                    
+                #@TODO: can probably move this higher up in function to prevent unnecessary work
+                if articleHashID not in articleIDs:
+                    print(f"Adding {url['id']} Article {articleTitle}")
+                    #@TODO: Probably update the "INSERT OR IGNORE INTO" as I think it's problematic
+                    cursor.execute("""
+                        INSERT OR IGNORE INTO articles
+                        (id, feed_id, title, link, published_date, summary, content_hash)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """, (articleHashID, url['id'], articleTitle, cleanArticleLink, cleanDate, cleanContent, contentHash))
+                #else:
+                    #print("Skipping")
+                
+            conn.commit()
+    except sqlite3.Error as e:
+        print("Error while trying to update feeds: {e}")
+    
+    finally:
+        conn.close()
+        #feedID = url['id']
+        #print(url['id'])
+        #print(feedID)
+    #print(urls)
+    #for url in urls:
+        #print(url[1])
     # First, get list of feed IDs and links in feeds db
+    # maybe set up dict with feeds = {'id'='', 'url'=''}
     # Next, loop through and call FeedGrabber(url) for each
     # If we're pulling from DB, we should be safe to assume the links are already Sanitized
     # Add any new articles
-    # in future, update existing ones as well
-    
-    conn.close()
+    # in future, update existing ones as well    
 
 def main():
     testURL = "https://www.bleepingcomputer.com/feed/"
