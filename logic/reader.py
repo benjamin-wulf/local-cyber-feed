@@ -8,10 +8,9 @@ from urllib.parse import urlparse, urlunparse
 from db.connection import GetDBConnection
 
 
-# Caution: does not Sanitize the url before grabbing them
 def FeedGrabber(url):
-    # Add sanitization here
-    feed = feedparser.parse(url)
+    cleanURL = SanitizeURL(url)
+    feed = feedparser.parse(cleanURL)
     if (feed.bozo == 1):
         print("Failed to grab RSS feed.")
         return
@@ -120,7 +119,7 @@ def SanitizeFeed(feed):
 
 def AddFeed(rawURL):
 
-    #TODO: move url sanitize to FeedGrabber()
+    # needs clean url for db check, but don't use FeedGrabber to prevent unecessary network comms
     cleanURL = SanitizeURL(rawURL)
 
     conn = GetDBConnection()
