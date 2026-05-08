@@ -1,6 +1,5 @@
 from app.main import app, scheduler
 from db.init_db import InitDB, DB_FOLDER, DATABASE_PATH
-from db.connection import GetDBConnection
 from pathlib import Path
 import os
 

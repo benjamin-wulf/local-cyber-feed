@@ -1,8 +1,9 @@
 import sqlite3
 from pathlib import Path
+from db.init_db import DB_FOLDER, DATABASE_PATH
 
-DB_FOLDER = Path(__file__).parent.absolute()
-DATABASE_PATH = DB_FOLDER / "rss_reader.db"
+#DB_FOLDER = Path(__file__).parent.absolute()
+#DATABASE_PATH = DB_FOLDER / "rss_reader.db"
 
 def GetDBConnection():
 

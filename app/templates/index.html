@@ -18,7 +18,28 @@
     </ul>
 
     <hr>
+    <div id="update-banner" style="display:none;">
+        <span id="update-msg"></span>
+        <a href="javascript:location.reload()">New Articles Available</a>
+    </div>
+    <script>
+        const lastDate = {{ articles[0]['added_at'] if articles else 0 }};
 
+        async function checkUpdates()
+        {
+            const response = await fetch(`/api/check-updates/${lastDate}`);
+            const data = await response.json();
+
+            if (data.new_articles > 0)
+            {
+                const banner = document.getElementById('update-banner');
+                banner.style.display = 'block';
+            }
+        }
+
+        setInterval(checkUpdates(), 30000);
+
+    </script>
     <h2>Recent Articles</h2>
     {% for article in articles %}
         <div class="article">
