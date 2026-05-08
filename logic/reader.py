@@ -15,7 +15,7 @@ def FeedGrabber(url):
         print("Failed to grab RSS feed.")
         return
     else:
-        print(f"Successfuly grabbed RSS feed from {feed.feed.get('title', cleanURL)}")
+        #print(f"Successfuly grabbed RSS feed from {feed.feed.get('title', cleanURL)}")
         #print(feed)
         # cleanFeed = SanitizeFeed(feed)
         return feed
@@ -244,9 +244,10 @@ def GetArticleData(article):
 
     return articleInfo
 
-
+#@TODO: eventually make this return a status value
 def UpdateAllFeeds():
 
+    tempAddedFlag = False
     conn = GetDBConnection()
     cursor = conn.cursor()
 
@@ -272,6 +273,7 @@ def UpdateAllFeeds():
                 
                 if articleData['hashID'] not in articleIDs:
                     print(f"Adding {feed.feed.get('title', url['url'])} Article {articleData['title']}")
+                    tempAddedFlag = True
                     #@TODO: Probably update the "INSERT OR IGNORE INTO" as I think it's problematic
                     cursor.execute("""
                         INSERT OR IGNORE INTO articles
@@ -285,6 +287,10 @@ def UpdateAllFeeds():
     
     finally:
         conn.close()
+        if tempAddedFlag == True:
+            print("Article added")
+        else:
+            print("No new articles found")
         
 
 def main():

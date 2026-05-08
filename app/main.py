@@ -4,15 +4,19 @@ import sys
 from pathlib import Path
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
+import os
 
 sys.path.append(str(Path(__file__).parent.parent))
 from db.connection import GetDBConnection
 from logic.reader import UpdateAllFeeds
 
+
+
 app = Flask(__name__)
+scheduler = APScheduler()
+scheduler.init_app(app)
 
 @app.route('/')
-
 def index():
     conn = GetDBConnection()
     
@@ -24,17 +28,16 @@ def index():
     #should have gotten feeds and 10 recent articles, now need to give the data to the HTML template
     return render_template('index.html', feeds=feeds, articles=articles)
 
-
-scheduler = APScheduler()
-
 @scheduler.task('interval', id='do_update_feeds', minutes=1)
 def update_feeds_task():
     with app.app_context():
         print("Running background sync...")
+        UpdateAllFeeds()
         # fetch & update
 
-scheduler.init_app(app)
-scheduler.start()
-
 if __name__ == '__main__':
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        scheduler.start()
+        print(" * Scheduler started in main worker process only")
+
     app.run(debug=True)
