@@ -20,8 +20,6 @@ Ultimately cross compatible between Windows, Linux, and macOS, as of now testing
 `python -m venv venv`
 3. Install required packages
 `pip install -r requirements.txt`
-4. (Temporary) Initiate database
-`python -m db.init_db`
-5. Launch main application
-`python -m app.main`
-6. Access the application via browser by navigating to `http://127.0.0.1:5000` (or the ip/port used by your local flask app)
+4. Run the application
+`python run.py`
+5. Access the application via browser by navigating to `http://127.0.0.1:5000` (or the ip/port used by your local flask app)
