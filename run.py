@@ -18,4 +18,4 @@ if __name__ == "__main__":
         scheduler.start()
         print("INFO: Scheduler started in main worker process")
 
-    app.run(debug=True)
+    app.run(port=8080, debug=True)

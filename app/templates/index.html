@@ -23,26 +23,30 @@
         <a href="javascript:location.reload()">New Articles Available</a>
     </div>
     <script>
-        const lastDate = {{ articles[0]['added_at'] if articles else 0 }};
-
+        
         async function checkUpdates()
         {
-            const response = await fetch(`/api/check-updates/${lastDate}`);
-            const data = await response.json();
+            //console.log("Running checkUpdates()");
+            
+            const articles = document.querySelectorAll('.article');            
+            let lastID = articles[0].getAttribute('articleID');
+
+            let response = await fetch(`/api/check-updates/${lastID}`);
+            let data = await response.json();
 
             if (data.new_articles > 0)
             {
-                const banner = document.getElementById('update-banner');
+                let banner = document.getElementById('update-banner');
                 banner.style.display = 'block';
             }
+            
         }
-
-        setInterval(checkUpdates(), 30000);
+        setInterval(checkUpdates, 30000);
 
     </script>
     <h2>Recent Articles</h2>
     {% for article in articles %}
-        <div class="article">
+        <div class="article" articleID="{{ article['id']}}">
             <h3><a href="{{ article['link'] }}">{{ article['title'] }}</a></h3>
             <p>From: <em>{{ article['feed_name'] }}</em></p>
             <p>Date: <em class = "local-date" data-utc="{{ article['published_date'] }}">{{ article['published_date'] }} (UTC)</em></p>
@@ -53,7 +57,6 @@
     function convertToLocal() {
 
         const dateElements = document.querySelectorAll('.local-date');
-
         dateElements.forEach(el => {
             const utcString = el.getAttribute('data-utc');
             if (utcString) {
@@ -67,7 +70,6 @@
         });
     }
 
-    // Run the function immediately
     convertToLocal();
 </script>
 </html>
