@@ -6,8 +6,10 @@
             body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
             .article { border-bottom: 1px solid #eee; padding: 10px 0;}
         </style>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
     </head>
     <body>
+        <main class="container">
     <h1>local-cyber-feed</h1>
 
     <h2>Test Feeds</h2>
@@ -52,9 +54,10 @@
             }
             
         }
-        setInterval(checkUpdates, 30000);
+        setInterval(checkUpdates, 300000);
 
     </script>
+
     <h2>Recent Articles</h2>
     {% for article in articles %}
         <div class="article" articleID="{{ article['id']}}">
@@ -63,6 +66,7 @@
             <p>Date: <em class = "local-date" data-utc="{{ article['published_date'] }}">{{ article['published_date'] }} (UTC)</em></p>
         </div>
     {% endfor %}
+</main>
 </body>
 <script>
     function convertToLocal() {

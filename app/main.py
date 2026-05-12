@@ -30,7 +30,7 @@ def index():
     
     return render_template('index.html', feeds=feeds, articles=articles)
 
-@scheduler.task('interval', id='do_update_feeds', minutes=1)
+@scheduler.task('interval', id='do_update_feeds', minutes=15)
 def update_feeds_task():
     with app.app_context():
         print("Running background sync...")
