@@ -8,7 +8,7 @@
         </style>
     </head>
     <body>
-    <h1>local-cyber-feeds</h1>
+    <h1>local-cyber-feed</h1>
 
     <h2>Test Feeds</h2>
     <ul>
@@ -17,6 +17,12 @@
         {% endfor %}
     </ul>
 
+
+    <form action="/api/add-feed" method="POST">
+        <label for="add-feed">Add Feed</label>
+        <input type="text" id="add-feed" name="add-feed">
+        <input type="submit" value="Add">
+    </form>
     <hr>
     <div id="update-banner" style="display:none;">
         <span id="update-msg"></span>

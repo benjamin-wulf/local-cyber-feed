@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from flask_apscheduler import APScheduler
 import sys
 from pathlib import Path
@@ -8,7 +8,7 @@ import os
 import sqlite3
 #sys.path.append(str(Path(__file__).parent.parent))
 from db.connection import GetDBConnection
-from logic.reader import UpdateAllFeeds
+from logic.reader import UpdateAllFeeds, AddFeed
 
 
 
@@ -58,3 +58,11 @@ def check_updates(last_id):
         print(f"ERROR: {e}")
     finally:
         conn.close()
+
+@app.route('/api/add-feed', methods=['GET', 'POST'])
+def add_feed():
+    #URL is sanitied in reader.py, should be safe to pass raw url through
+    url = request.form.get('add-feed')
+    status = AddFeed(url)
+    # This can be improved later to prevent refreshing the whole page
+    return redirect(url_for('index'))
