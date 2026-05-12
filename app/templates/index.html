@@ -13,7 +13,12 @@
     <h2>Test Feeds</h2>
     <ul>
         {% for feed in feeds %}
-            <li>{{ feed['title'] }}</li>
+            <li>{{ feed['title'] }}
+                <form action="/api/delete-feed" method="POST" style="display:inline">
+                    <input type="hidden" id="feed-id" name="feed-id" value={{ feed['id'] }} >
+                    <input type="submit" value="X">
+                </form>
+            </li>
         {% endfor %}
     </ul>
 

@@ -8,7 +8,7 @@ import os
 import sqlite3
 #sys.path.append(str(Path(__file__).parent.parent))
 from db.connection import GetDBConnection
-from logic.reader import UpdateAllFeeds, AddFeed
+from logic.reader import UpdateAllFeeds, AddFeed, DeleteFeed
 
 
 
@@ -65,4 +65,13 @@ def add_feed():
     url = request.form.get('add-feed')
     status = AddFeed(url)
     # This can be improved later to prevent refreshing the whole page
+    return redirect(url_for('index'))
+
+# This should only exist in dev, a production environment probably shouldn't be deleting DB data from frontend
+@app.route('/api/delete-feed', methods=['GET', 'POST'])
+def delete_feed():
+    feedID = request.form.get('feed-id')
+    print(f"INFO: UI trying to delete feed {feedID}")
+    status = DeleteFeed(feedID)
+    print(f"Status: {status['status']}")
     return redirect(url_for('index'))
