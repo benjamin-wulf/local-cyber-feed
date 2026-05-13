@@ -2,35 +2,40 @@
 <html>
     <head>
         <Title>local-cyber-feed</Title>
-        <style>
-            body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
-            .article { border-bottom: 1px solid #eee; padding: 10px 0;}
-        </style>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
+        <style>
+            :root
+            {
+                --pico-font-size:90%;
+            }
+        </style>
     </head>
     <body>
         <main class="container">
     <h1>local-cyber-feed</h1>
-
+    <div class="grid">
+        <div>
     <h2>Test Feeds</h2>
     <ul>
         {% for feed in feeds %}
-            <li>{{ feed['title'] }}
-                <form action="/api/delete-feed" method="POST" style="display:inline">
+            <li role="group">{{ feed['title'] }}
+                <form action="/api/delete-feed" method="POST">
                     <input type="hidden" id="feed-id" name="feed-id" value={{ feed['id'] }} >
-                    <input type="submit" value="X">
+                    <input type="submit" value="X" class="outline" style="margin-left:5px;">
                 </form>
             </li>
         {% endfor %}
     </ul>
-
-
+    </div>
+<div>
+    
     <form action="/api/add-feed" method="POST">
         <label for="add-feed">Add Feed</label>
         <input type="text" id="add-feed" name="add-feed">
         <input type="submit" value="Add">
     </form>
-    <hr>
+    </div>
+    </div>
     <div id="update-banner" style="display:none;">
         <span id="update-msg"></span>
         <a href="javascript:location.reload()">New Articles Available</a>
@@ -57,6 +62,7 @@
         setInterval(checkUpdates, 300000);
 
     </script>
+    <hr>
 
     <h2>Recent Articles</h2>
     {% for article in articles %}
@@ -64,6 +70,7 @@
             <h3><a href="{{ article['link'] }}">{{ article['title'] }}</a></h3>
             <p>From: <em>{{ article['feed_name'] }}</em></p>
             <p>Date: <em class = "local-date" data-utc="{{ article['published_date'] }}">{{ article['published_date'] }} (UTC)</em></p>
+            <p style="max-height: 200px; overflow:scroll;">{{ article['summary'] }}</p>
         </div>
     {% endfor %}
 </main>

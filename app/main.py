@@ -22,7 +22,7 @@ def index():
     try:
         conn = GetDBConnection()
         feeds = conn.execute('SELECT * FROM feeds').fetchall()
-        articles = conn.execute('SELECT a.title, a.link, a.published_date, a.id, f.title as feed_name FROM articles a JOIN feeds f ON a.feed_id = f.id ORDER BY a.published_date DESC LIMIT 10').fetchall()
+        articles = conn.execute('SELECT a.title, a.link, a.published_date, a.id, a.summary, f.title as feed_name FROM articles a JOIN feeds f ON a.feed_id = f.id ORDER BY a.published_date DESC LIMIT 10').fetchall()
     except sqlite3.Error as e:
         print("ERROR: Could not read articles from DB: {e}")
     finally:
